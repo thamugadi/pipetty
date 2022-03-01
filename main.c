@@ -6,14 +6,11 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-int sendTTY(int ptty_fd, char* message, int len)
+void sendTTY(int ptty_fd, char* message, int len)
 {
-        int success;
         for (int i = 0; i < len; i++) {
-                success = ioctl(ptty_fd, TIOCSTI, message+i);
-                if (success) return success;
+                ioctl(ptty_fd, TIOCSTI, message+i);
         }
-        return success;
 }
 
 int main(int argc, char** argv)
@@ -27,8 +24,7 @@ int main(int argc, char** argv)
         int len = lseek(fd,0, SEEK_END);
         char* data = mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
         int pts_fd = open(argv[1], O_RDWR);
-        int s;
-        s = sendTTY(pts_fd, data, len);
+        sendTTY(pts_fd, data, len);
         sleep(2);
         write(pts_fd, clearSymbols, 3);
 }
